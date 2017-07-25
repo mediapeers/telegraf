@@ -73,15 +73,19 @@ cat $GOPATH/bin/telegraf | gzip > $CIRCLE_ARTIFACTS/telegraf.gz
 go build -o telegraf-race -race -ldflags "-X main.version=${VERSION}-RACE" cmd/telegraf/telegraf.go
 cat telegraf-race | gzip > $CIRCLE_ARTIFACTS/telegraf-race.gz
 
+# install fpm (packaging dependency)
+exit_if_fail gem install fpm
+# install boto & rpm (packaging & AWS dependencies)
+exit_if_fail sudo apt-get install -y rpm python-boto
+unset GOGC
+
 eval "git describe --exact-match HEAD"
 if [ $? -eq 0 ]; then
-    # install fpm (packaging dependency)
-    exit_if_fail gem install fpm
-    # install boto & rpm (packaging & AWS dependencies)
-    exit_if_fail sudo apt-get install -y rpm python-boto
-    unset GOGC
     tag=$(git describe --exact-match HEAD)
     echo $tag
     exit_if_fail ./scripts/build.py --release --package --platform=all --arch=all --upload --bucket=dl.influxdata.com/telegraf/releases
+    mv build $CIRCLE_ARTIFACTS
+else
+    exit_if_fail ./scripts/build.py --package --platform=all --arch=all
     mv build $CIRCLE_ARTIFACTS
 fi
