@@ -46,6 +46,13 @@ for the stat structure can be found
   
   ## Which environment variables should we use as a tag
   tag_env = ["JAVA_HOME", "HEAP_SIZE"]
+
+  ## Optional SSL Config
+  # ssl_ca = "/etc/telegraf/ca.pem"
+  # ssl_cert = "/etc/telegraf/cert.pem"
+  # ssl_key = "/etc/telegraf/key.pem"
+  ## Use SSL but skip chain & host verification
+  # insecure_skip_verify = false
 ```
 
 ### Measurements & Fields:
