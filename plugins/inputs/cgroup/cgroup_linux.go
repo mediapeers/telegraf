@@ -81,6 +81,7 @@ func isDir(path string) (bool, error) {
 }
 
 func (g *CGroup) generateDirs(list chan<- pathInfo) {
+	defer close(list)
 	for _, dir := range g.Paths {
 		// getting all dirs that match the pattern 'dir'
 		items, err := filepath.Glob(dir)
@@ -101,10 +102,10 @@ func (g *CGroup) generateDirs(list chan<- pathInfo) {
 			}
 		}
 	}
-	close(list)
 }
 
 func (g *CGroup) generateFiles(dir string, list chan<- pathInfo) {
+	defer close(list)
 	for _, file := range g.Files {
 		// getting all file paths that match the pattern 'dir + file'
 		// path.Base make sure that file variable does not contains part of path
@@ -126,7 +127,6 @@ func (g *CGroup) generateFiles(dir string, list chan<- pathInfo) {
 			}
 		}
 	}
-	close(list)
 }
 
 // ======================================================================
@@ -225,7 +225,7 @@ var fileFormats = [...]fileFormat{
 }
 
 func numberOrString(s string) interface{} {
-	i, err := strconv.Atoi(s)
+	i, err := strconv.ParseInt(s, 10, 64)
 	if err == nil {
 		return i
 	}
